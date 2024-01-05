@@ -6,7 +6,6 @@ const sendChatBtn = document.querySelector(".chat-input span");
 let userMessage = null; // Variable to store user's message
 let canSend = true;
 let chatHistory = localStorage.getItem('chatHistory');
-// const API_KEY = "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"; // Paste your API key here
 const inputInitHeight = chatInput.scrollHeight;
 // const { response } = require("express");
 // const { Configuration, OpenAIApi } = require("openai");
