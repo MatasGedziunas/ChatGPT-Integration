@@ -35,34 +35,14 @@ async function checkRunStatus(threadId, runId){
 
 async function useAssistant(messages) {
     try {
-        const assistant = await openai.beta.assistants.create({
-            name: "Paint by numbers shop assistant",
-            instructions: "You are a paint by numbers shop assistant. The shop is called 'Simple Painting'. Provide help to users",
-            tools: [{type: "retrieval"}],
-            model: "gpt-3.5-turbo-1106"
+        const completion = await openai.chat.completions.create({
+            messages: [{"role": "system", "content": "You are a helpful assistant."},
+        {"role": "user", "content": "Who won the world series in 2020?"},
+        {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
+        {"role": "user", "content": "Where was it played?"}],
+            model: "gpt-3.5-turbo",
         });
-        const thread = await openai.beta.threads.create();
-        for(let i = 0; i < messages.length;i++){
-            // await openai.beta.threads.messages.create(
-            //     thread.id,
-            //     {role: messages[i].role, content: messages[i].content}
-            // );
-            
-        }
-        await openai.beta.threads.messages.create(
-            thread.id,
-            { role: "user", content: "How does AI work? Explain it in simple terms." }
-          );
-        const run = await openai.beta.threads.runs.create(
-            thread.id,
-            {
-                assistant_id: assistant.id
-            }
-        );
-        const runStatus = await checkRunStatus(thread.id, run.id);
-        const messageList = await openai.beta.threads.messages.list(thread.id);
-        const lastMessage = messageList.data[messageList.data.length - 1].content.text;
-        return lastMessage;
+        return completion.choices[0].message.content;
     } catch (error) {
         console.error("Error creating assistant:", error);
     }
