@@ -6,29 +6,26 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, 'public')));
-app.listen(3000, () => {console.log("Server running")});
+app.listen(3000, () => { console.log("Server running") });
 
 const OpenAI = require("openai");
 const { threadId } = require('worker_threads');
 const openai = new OpenAI();
 
-async function checkRunStatus(threadId, runId){
-    try{
+async function checkRunStatus(threadId, runId) {
+    try {
         const run = await openai.beta.threads.runs.retrieve(threadId, runId);
         console.log(run.status);
         console.log(run.last_error);
-        if(run.status == "failed"){
+        if (run.status == "failed") {
             return false;
-        }
-        else if(run.status != "completed"){
+        } else if (run.status != "completed") {
             await new Promise(resolve => setTimeout(resolve, 500));
             return checkRunStatus(threadId, runId);
-        }
-        else{
+        } else {
             return true;
         }
-    }
-    catch(error){
+    } catch (error) {
         console.error("Error checking run status: ", error);
     }
 }
@@ -36,10 +33,11 @@ async function checkRunStatus(threadId, runId){
 async function useAssistant(messages) {
     try {
         const completion = await openai.chat.completions.create({
-            messages: [{"role": "system", "content": "You are a helpful assistant."},
-        {"role": "user", "content": "Who won the world series in 2020?"},
-        {"role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020."},
-        {"role": "user", "content": "Where was it played?"}],
+            messages: [{ "role": "system", "content": "You are a helpful assistant." },
+                { "role": "user", "content": "Who won the world series in 2020?" },
+                { "role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020." },
+                { "role": "user", "content": "Where was it played?" }
+            ],
             model: "gpt-3.5-turbo",
         });
         return completion.choices[0].message.content;
