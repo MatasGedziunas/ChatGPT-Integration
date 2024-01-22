@@ -54,6 +54,7 @@ async function useAssistant(messages) {
 
 app.post('/getResponse', async (request, response) => {
     try {
+        console.log("Got request");
         const assistantResponse = await useAssistant(request.body.conversation);
         console.log(assistantResponse);
         response.json({ message: assistantResponse });
