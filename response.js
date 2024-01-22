@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const app = express();
 
 app.use(cors());
@@ -11,7 +12,14 @@ app.listen(3000, () => { console.log("Server running") });
 const OpenAI = require("openai");
 const { threadId } = require('worker_threads');
 const openai = new OpenAI();
-
+const systemMessage = { "role": "system", "content": "" };
+fs.readFile(path.join(__dirname, 'public', "instructions.txt"), 'utf8', (err, data) => {
+    if (err) {
+        console.error("Error reading file:", err);
+    } else {
+        systemMessage.content = data;
+    }
+});
 async function checkRunStatus(threadId, runId) {
     try {
         const run = await openai.beta.threads.runs.retrieve(threadId, runId);
@@ -32,21 +40,19 @@ async function checkRunStatus(threadId, runId) {
 
 async function useAssistant(messages) {
     try {
+        messages.unshift(systemMessage);
         const completion = await openai.chat.completions.create({
-            messages: [{ "role": "system", "content": "You are a helpful assistant." },
-                { "role": "user", "content": "Who won the world series in 2020?" },
-                { "role": "assistant", "content": "The Los Angeles Dodgers won the World Series in 2020." },
-                { "role": "user", "content": "Where was it played?" }
-            ],
+            messages: messages,
             model: "gpt-3.5-turbo",
         });
-        return completion.choices[0].message.content;
+        const response = completion.choices[0].message;
+        return response.content;
     } catch (error) {
         console.error("Error creating assistant:", error);
     }
 }
 
-app.post('/getResponse', async(request, response) => {
+app.post('/getResponse', async (request, response) => {
     try {
         const assistantResponse = await useAssistant(request.body.conversation);
         console.log(assistantResponse);

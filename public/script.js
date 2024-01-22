@@ -31,13 +31,13 @@ const createChatLi = (message, className) => {
     return chatLi; // return chat <li> element
 }
 
-const generateResponse = async(chatElement) => {
-    if(!canSend){
+const generateResponse = async (chatElement) => {
+    if (!canSend) {
         return;
     }
     const messageElement = chatElement.querySelector("p");
-    const body = {key: "val"};
-    apiCall = async() => {
+    const body = { key: "val" };
+    apiCall = async () => {
         const settings = {
             method: 'POST',
             headers: {
@@ -46,19 +46,19 @@ const generateResponse = async(chatElement) => {
             },
             body: JSON.stringify(body)
         }
-        try{
+        try {
+            console.log("Hello");
             const fetchResponse = await fetch("http://localhost:3000/getResponse", settings);
             const data = await fetchResponse.json();
             return data;
-        }
-        catch(e){
+        } catch (e) {
             console.log(e);
         }
     }
     const apiResponse = await apiCall();
     console.log(apiResponse);
-    sendChatBtn.disabled = true;   
-    setTimeout(function(){
+    sendChatBtn.disabled = true;
+    setTimeout(function () {
         sendChatBtn.disabled = false;
     }, 1000);
     // Define the properties and message for the API request
@@ -129,7 +129,7 @@ chatInput.addEventListener("keydown", (e) => {
     // If Enter key is pressed and message sending is allowed
     if (e.key === "Enter" && !e.shiftKey) {
         e.preventDefault();
-        if(canSend){
+        if (canSend) {
             handleChat();
             chatInput.style.height = `${inputInitHeight}px`;
             chatInput.style.height = `${chatInput.scrollHeight}px`;
