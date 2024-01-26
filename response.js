@@ -10,7 +10,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.listen(3000, () => { console.log("Server running") });
 
 const OpenAI = require("openai");
-const { threadId } = require('worker_threads');
 const openai = new OpenAI();
 const systemMessage = { "role": "system", "content": "" };
 fs.readFile(path.join(__dirname, 'public', "instructions.txt"), 'utf8', (err, data) => {
@@ -20,39 +19,57 @@ fs.readFile(path.join(__dirname, 'public', "instructions.txt"), 'utf8', (err, da
         systemMessage.content = data;
     }
 });
-async function checkRunStatus(threadId, runId) {
-    try {
-        const run = await openai.beta.threads.runs.retrieve(threadId, runId);
-        console.log(run.status);
-        console.log(run.last_error);
-        if (run.status == "failed") {
-            return false;
-        } else if (run.status != "completed") {
-            await new Promise(resolve => setTimeout(resolve, 500));
-            return checkRunStatus(threadId, runId);
-        } else {
-            return true;
-        }
-    } catch (error) {
-        console.error("Error checking run status: ", error);
+
+class Response {
+    constructor() {
+        this.status = "";
+        this.message = "";
+    }
+
+    addStatus(status) {
+        this.status = status;
+        return this;
+    }
+    addMessage(message) {
+        this.message = message;
+        return this;
+    }
+    getJsonObject() {
+        return { status: this.status, message: this.message };
     }
 }
 
+function validateMessages(messages) {
+    for (let i = 0; i < messages.length; i++) {
+        const message = messages[i];
+        if (message.role == null || message.content == null) {
+            messages.splice(i, 1);
+        }
+    }
+    return messages;
+}
+
+// IMPLEMENTUOTI VALIDATIONS
 async function useAssistant(messages) {
     try {
+        messages = JSON.parse(messages);
+        messages = validateMessages(messages);
         messages.unshift(systemMessage);
         const completion = await openai.chat.completions.create({
             messages: messages,
             model: "gpt-3.5-turbo",
         });
-        const response = completion.choices[0].message;
-        return response.content;
+        let responseMessage = completion.choices[0].message.content;
+        console.log(responseMessage);
+        let response = new Response().addMessage(responseMessage).addStatus(200);
+        return response.getJsonObject();
     } catch (error) {
-        console.error("Error creating assistant:", error);
+        let response = { status: 400, content: "Oops! Something went wrong on our servers. For the best support, please contact us at support@simple-painting.com. Thank you for understanding." };
+        console.error("Error contacting assistant:", error);
     }
 }
 
-app.post('/getResponse', async (request, response) => {
+app.post('/getResponse', async(request, response) => {
     try {
         console.log("Got request");
         const assistantResponse = await useAssistant(request.body.conversation);

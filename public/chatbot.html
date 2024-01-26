@@ -24,9 +24,24 @@
             <span class="close-btn material-symbols-outlined">close</span>
         </header>
         <ul class="chatbox">
-            <li class="chat incoming">
-                <span class="material-symbols-outlined">smart_toy</span>
-                <p>Hi there 👋<br>How can I help you today?</p>
+            <div class="conversation">
+                <li class="chat incoming">
+                    <span class="material-symbols-outlined">smart_toy</span>
+                    <p>Hi there 👋<br>How can I help you today?</p>
+                </li>
+            </div>
+            <!-- Starter Questions -->
+            <li class="chat bottom-chat" id="starter-questions">
+                <ul>
+                    <div class="starter-questions-wrapper">
+                        <div class="starter-question" onclick="handleStarterQuestion(this)">
+                            <li>What's the status of my order?</li>
+                        </div>
+                        <div class="starter-question" onclick="handleStarterQuestion(this)">
+                            <li>Where do you ship to?</li>
+                        </div>
+                    </div>
+                </ul>
             </li>
         </ul>
         <div class="chat-input">
@@ -34,6 +49,7 @@
             <span id="send-btn" class="material-symbols-rounded">send</span>
         </div>
     </div>
+
 </body>
 
 </html>
