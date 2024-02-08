@@ -14,59 +14,56 @@ const serverUrl = "http://localhost:3000/getResponse";
 const roles = { user: "user", assistant: "assistant" };
 const createChatLi = (message, className) => {
     // Create a chat <li> element with passed message and className
+    message = linkifyApiResponse(message);
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", `${className}`);
     let chatContent = className === "outgoing" ? `<p></p>` : `<span class="material-symbols-outlined">smart_toy</span><p></p>`;
     chatLi.innerHTML = chatContent;
-    chatLi.querySelector("p").textContent = message;
+    chatLi.querySelector("p").innerHTML = message;
     return chatLi; // return chat <li> element
 }
 
-const generateResponse = async (chatElement, userMessage) => {
+// WEBSOCKETS
+let ws;
+let isFirstChunk = true;
+
+function updateChatUI(chunk) {
+    const lastMessageElement = chatbox.lastChild.querySelector("p");
+    console.log("hellop");
+    // Clear the last message element when the first chunk arrives
+    if (isFirstChunk) {
+        lastMessageElement.innerHTML = '';
+        isFirstChunk = false;
+    }
+    if (chunk.status == 200) {
+        saveChatMessage(roles.assistant, lastMessageElement.innerHTML);
+        lastMessageElement.innerHTML = linkifyApiResponse(lastMessageElement.innerHTML);
+    } else {
+        lastMessageElement.innerHTML += chunk.message;
+    }
+
+}
+
+const generateResponse = async(chatElement, userMessage) => {
     saveChatMessage(roles.user, userMessage);
-    // fix this stuff, reikia kad normaliai json objektai butu storinami in storage, o 
-    // tesiog stringai.
     chatHistory = localStorage.getItem(localStorageIdentifier);
     console.log(chatHistory);
-    const messageElement = chatElement.querySelector("p");
-    const body = { key: "val" };
-    apiCall = async () => {
-        const settings = {
-            method: 'POST',
-            headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                "conversation": chatHistory
-            })
-        };
-        try {
-            const fetchResponse = await fetch(serverUrl, settings);
-            const data = await fetchResponse.json();
-            return data;
-        } catch (e) {
-            console.log(e);
-        }
-    }
-    let apiResponse = await apiCall();
-    // apiResponse = apiResponse.message;
-    console.log(apiResponse);
-    if (typeof apiResponse !== 'undefined' && apiResponse !== null && apiResponse.message.status == 200) {
-        console.log(apiResponse.status);
-        messageElement.textContent = apiResponse.message.message;
-        saveChatMessage(roles.assistant, apiResponse.message.message);
+    let messageElement = chatElement.querySelector('p');
+    if (ws.readyState === WebSocket.OPEN) {
+        ws.send(chatHistory);
     } else {
+        console.error('WebSocket connection is not open');
         messageElement.classList.add("error");
         messageElement.textContent = "Oops! Something went wrong on our servers. For the best support, please contact us at support@simple-painting.com. Thank you for understanding.";
     }
+    isFirstChunk = true;
     chatbox.scrollTo(0, chatbox.scrollHeight);
     sendChatBtn.disabled = true;
-    setTimeout(function () {
+    setTimeout(function() {
         sendChatBtn.disabled = false;
     }, 1000);
-
 }
+
 const handleChat = () => {
     hideStarterQuestions();
     userMessage = chatInput.value.trim(); // Get user entered message and remove extra whitespace
@@ -74,8 +71,6 @@ const handleChat = () => {
     // Clear the input textarea and set its height to default
     chatInput.value = "";
     chatInput.style.height = `${inputInitHeight}px`;
-    // Append the user's message to the chatbox
-    // saveChatMessage(userMessage);
     chatbox.appendChild(createChatLi(userMessage, "outgoing"));
     chatbox.scrollTo(0, chatbox.scrollHeight);
     setTimeout(() => {
@@ -86,6 +81,29 @@ const handleChat = () => {
         generateResponse(incomingChatLi, userMessage);
     }, 600);
 }
+
+function linkifyApiResponse(apiResponse) {
+    // Extract the message from the response
+    let message = apiResponse;
+
+    // Regular expression to match URLs
+    const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+
+    // Replace URLs with <a> tags
+    const linkedMessage = message.replace(urlRegex, function(url) {
+        // Ensure the url starts with a valid protocol or 'www.'
+        let hyperlink = url;
+        if (!hyperlink.match('^https?:\/\/')) {
+            hyperlink = 'http://' + hyperlink; // Assuming http if no protocol is specified
+        }
+        // Return the hyperlink <a> tag
+        return `<a href="${hyperlink}" target="_blank">${url}</a>`;
+    });
+
+    // Return the linked message
+    return linkedMessage;
+}
+
 
 function saveChatMessage(role, message) {
     try {
@@ -165,11 +183,39 @@ chatInput.addEventListener("keydown", (e) => {
     }
 });
 
+function initiateWebSocketConnection() {
+    ws = new WebSocket('ws://localhost:3000');
+
+    ws.onopen = () => {
+        console.log('WebSocket connection established');
+    };
+
+    ws.onmessage = (event) => {
+        const response = JSON.parse(event.data);
+        if (response && (response.status === 200 || response.status === 206)) {
+            // Update your chat UI here with the streamed response
+            updateChatUI(response);
+        } else {
+            // Handle errors or status messages
+            console.error('Streaming error:', response.content);
+
+        }
+    };
+}
+
 sendChatBtn.addEventListener("click", handleChat);
-closeBtn.addEventListener("click", () => document.body.classList.remove("show-chatbot"));
+closeBtn.addEventListener("click", () => {
+    document.body.classList.remove("show-chatbot")
+    ws.close();
+});
 chatbotToggler.addEventListener("click", () => {
     document.body.classList.toggle("show-chatbot")
-    showChatHistory();
+    if (chatHistory) {
+        showChatHistory();
+    }
+    initiateWebSocketConnection();
 });
 // add messages from history
-showStarterQuestions();
+if (chatHistory == null) {
+    showStarterQuestions();
+}

@@ -115,6 +115,10 @@ textarea)::-webkit-scrollbar-thumb {
     list-style: none;
 }
 
+.chatbox {
+    padding-bottom: 100px;
+}
+
 .chatbox .outgoing {
     margin: 20px 0;
     justify-content: flex-end;
