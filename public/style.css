@@ -57,6 +57,7 @@ body.show-chatbot .chatbot-toggler span:last-child {
     transform-origin: bottom right;
     box-shadow: 0 0 128px 0 rgba(0, 0, 0, 0.1), 0 32px 64px -48px rgba(0, 0, 0, 0.5);
     transition: all 0.1s ease;
+    justify-content: space-between;
 }
 
 body.show-chatbot .chatbot {
@@ -90,7 +91,7 @@ header h2 {
 .chatbot .chatbox {
     overflow-y: auto;
     height: 700px;
-    padding: 30px 20px 100px;
+    padding: 30px 20px 130px;
 }
 
 .chatbot :where(.chatbox,
@@ -113,10 +114,6 @@ textarea)::-webkit-scrollbar-thumb {
 .chatbox .chat {
     display: flex;
     list-style: none;
-}
-
-.chatbox {
-    padding-bottom: 100px;
 }
 
 .chatbox .outgoing {
@@ -191,7 +188,7 @@ textarea)::-webkit-scrollbar-thumb {
 }
 
 .chatbox .starter-question {
-    margin: 20px 0;
+    margin: 15px 0;
     padding: 10px;
     background: #e8e8e8;
     /* Light grey background */
@@ -302,12 +299,16 @@ textarea)::-webkit-scrollbar-thumb {
     }
     .chatbot .chatbox {
         height: 90%;
-        padding: 25px 15px 100px;
+        padding: 25px 15px 150px;
     }
     .chatbot .chat-input {
         padding: 5px 15px;
     }
     .chatbot header span {
         display: block;
+    }
+    #starter-questions {
+        width: 92%;
+        height: 17%;
     }
 }

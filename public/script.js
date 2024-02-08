@@ -29,7 +29,6 @@ let isFirstChunk = true;
 
 function updateChatUI(chunk) {
     const lastMessageElement = chatbox.lastChild.querySelector("p");
-    console.log("hellop");
     // Clear the last message element when the first chunk arrives
     if (isFirstChunk) {
         lastMessageElement.innerHTML = '';
@@ -44,39 +43,36 @@ function updateChatUI(chunk) {
 
 }
 
-const generateResponse = async(chatElement, userMessage) => {
+const generateResponse = async (chatElement, userMessage) => {
     saveChatMessage(roles.user, userMessage);
     chatHistory = localStorage.getItem(localStorageIdentifier);
-    console.log(chatHistory);
     let messageElement = chatElement.querySelector('p');
     if (ws.readyState === WebSocket.OPEN) {
         ws.send(chatHistory);
     } else {
-        console.error('WebSocket connection is not open');
         messageElement.classList.add("error");
         messageElement.textContent = "Oops! Something went wrong on our servers. For the best support, please contact us at support@simple-painting.com. Thank you for understanding.";
     }
     isFirstChunk = true;
     chatbox.scrollTo(0, chatbox.scrollHeight);
     sendChatBtn.disabled = true;
-    setTimeout(function() {
+    setTimeout(function () {
         sendChatBtn.disabled = false;
     }, 1000);
 }
 
 const handleChat = () => {
     hideStarterQuestions();
-    userMessage = chatInput.value.trim(); // Get user entered message and remove extra whitespace
+    userMessage = chatInput.value.trim();
     if (!userMessage) return;
-    // Clear the input textarea and set its height to default
     chatInput.value = "";
     chatInput.style.height = `${inputInitHeight}px`;
-    chatbox.appendChild(createChatLi(userMessage, "outgoing"));
+    addMessageElementToChat(createChatLi(userMessage, "outgoing"));
     chatbox.scrollTo(0, chatbox.scrollHeight);
     setTimeout(() => {
         // Display "Thinking..." message while waiting for the response
         const incomingChatLi = createChatLi("Thinking...", "incoming");
-        chatbox.appendChild(incomingChatLi);
+        addMessageElementToChat(incomingChatLi);
         chatbox.scrollTo(0, chatbox.scrollHeight);
         generateResponse(incomingChatLi, userMessage);
     }, 600);
@@ -90,7 +86,7 @@ function linkifyApiResponse(apiResponse) {
     const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
 
     // Replace URLs with <a> tags
-    const linkedMessage = message.replace(urlRegex, function(url) {
+    const linkedMessage = message.replace(urlRegex, function (url) {
         // Ensure the url starts with a valid protocol or 'www.'
         let hyperlink = url;
         if (!hyperlink.match('^https?:\/\/')) {
@@ -116,8 +112,6 @@ function saveChatMessage(role, message) {
         // Convert the array back to a string to store in localStorage
         localStorage.setItem(localStorageIdentifier, JSON.stringify(chatHistory));
     } catch (error) {
-        console.error("Error handling chat history:", error);
-
         // Clear or reset localStorage if there's an error
         localStorage.setItem(localStorageIdentifier, JSON.stringify([]));
         chatHistory = localStorage.getItem(localStorageIdentifier);
@@ -137,6 +131,7 @@ function showStarterQuestions() {
 
 function hideStarterQuestions() {
     starterQuestions.classList.remove('show');
+    chatbox.style.padding = "25px 15px 100px";
 }
 
 function handleStarterQuestion(starterQuestionDiv) {
@@ -147,7 +142,6 @@ function handleStarterQuestion(starterQuestionDiv) {
 }
 
 function showChatHistory() {
-    console.log(chatHistory);
     let objectChatHistory = JSON.parse(chatHistory);
     for (let msg of objectChatHistory) {
         let chatLi;
@@ -156,9 +150,13 @@ function showChatHistory() {
         } else if (msg.role == roles.assistant) {
             chatLi = createChatLi(msg.content, "incoming");
         }
-        chatbox.appendChild(chatLi);
+        addMessageElementToChat(chatLi);
     }
     chatbox.scrollTo(0, chatbox.scrollHeight);
+}
+
+function addMessageElementToChat(chatLi) {
+    chatbox.appendChild(chatLi);
 }
 
 chatInput.addEventListener("input", () => {
@@ -186,9 +184,7 @@ chatInput.addEventListener("keydown", (e) => {
 function initiateWebSocketConnection() {
     ws = new WebSocket('ws://localhost:3000');
 
-    ws.onopen = () => {
-        console.log('WebSocket connection established');
-    };
+    ws.onopen = () => { };
 
     ws.onmessage = (event) => {
         const response = JSON.parse(event.data);
@@ -197,7 +193,6 @@ function initiateWebSocketConnection() {
             updateChatUI(response);
         } else {
             // Handle errors or status messages
-            console.error('Streaming error:', response.content);
 
         }
     };
@@ -215,7 +210,4 @@ chatbotToggler.addEventListener("click", () => {
     }
     initiateWebSocketConnection();
 });
-// add messages from history
-if (chatHistory == null) {
-    showStarterQuestions();
-}
+showStarterQuestions();
