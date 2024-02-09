@@ -211,3 +211,4 @@ chatbotToggler.addEventListener("click", () => {
     initiateWebSocketConnection();
 });
 showStarterQuestions();
+console.log("wtf");

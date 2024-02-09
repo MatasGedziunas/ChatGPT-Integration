@@ -91,7 +91,12 @@ header h2 {
 .chatbot .chatbox {
     overflow-y: auto;
     height: 700px;
-    padding: 30px 20px 130px;
+    padding: 30px 20px;
+    padding-bottom: 175px;
+}
+
+.chatbox {
+    border-radius: 20px;
 }
 
 .chatbot :where(.chatbox,
@@ -298,7 +303,7 @@ textarea)::-webkit-scrollbar-thumb {
         width: 100%;
     }
     .chatbot .chatbox {
-        height: 90%;
+        height: 80%;
         padding: 25px 15px 150px;
     }
     .chatbot .chat-input {
