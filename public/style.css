@@ -1,5 +1,32 @@
 /* Import Google font - Poppins */
 
+:root {
+    --primary-bg-color: #121312;
+    --text-color: #fff;
+    --chat-bg-color: #fff;
+    --chat-text-color: #000;
+    --border-radius: 20px;
+    /* Rounded corners */
+    --transition-speed: 0.3s;
+    /* Smooth transition for interactive elements */
+    --button-bg-color: #e8e8e8;
+    /* Light grey background */
+    --button-bg-hover-color: #d7d7d7;
+    /* Slightly darker grey for hover effect */
+    --button-text-color: #333;
+    /* Dark grey text color for readability */
+    --button-hover-text-color: #007bff;
+    /* Blue color for text on hover */
+    --button-font-size: 1.1rem;
+    --button-border-radius: 20px;
+    /* More rounded corners for a modern look */
+    --button-transition: background-color 0.3s ease, color 0.3s ease;
+    --button-padding: 10px 20px;
+    /* More padding for a larger clickable area */
+    --button-margin: 10px 0;
+    /* Vertical spacing between buttons */
+}
+
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap');
 * {
     margin: 0;
@@ -48,15 +75,17 @@ body.show-chatbot .chatbot-toggler span:last-child {
     right: 35px;
     bottom: 90px;
     width: 400px;
-    background: #fff;
-    border-radius: 15px;
+    height: 700px;
+    background: var(--chat-bg-color);
     overflow: hidden;
     opacity: 0;
     pointer-events: none;
     transform: scale(0.5);
     transform-origin: bottom right;
-    box-shadow: 0 0 128px 0 rgba(0, 0, 0, 0.1), 0 32px 64px -48px rgba(0, 0, 0, 0.5);
-    transition: all 0.1s ease;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-speed) ease;
+    display: flex;
+    flex-direction: column;
     justify-content: space-between;
 }
 
@@ -66,37 +95,37 @@ body.show-chatbot .chatbot {
     transform: scale(1);
 }
 
+
+/* Chat header */
+
 .chatbot header {
-    padding: 16px 0;
-    position: relative;
+    background: var(--primary-bg-color);
+    color: var(--text-color);
+    padding: 20px;
     text-align: center;
-    color: #fff;
-    background: #121312;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    /* border-top-left-radius: var(--border-radius);
+    border-top-right-radius: var(--border-radius); */
+    /* ... */
 }
 
 .chatbot header span {
     position: absolute;
     right: 15px;
-    top: 50%;
-    display: none;
+    top: 4%;
     cursor: pointer;
     transform: translateY(-50%);
 }
 
 header h2 {
-    font-size: 1.4rem;
+    font-size: 1.1rem;
 }
 
 .chatbot .chatbox {
     overflow-y: auto;
+    flex-grow: 1;
     height: 700px;
-    padding: 30px 20px;
-    padding-bottom: 175px;
-}
-
-.chatbox {
-    border-radius: 20px;
+    padding: 20px 20px;
+    padding-bottom: 100px;
 }
 
 .chatbot :where(.chatbox,
@@ -119,6 +148,10 @@ textarea)::-webkit-scrollbar-thumb {
 .chatbox .chat {
     display: flex;
     list-style: none;
+}
+
+.chatbox {
+    padding-bottom: 100px;
 }
 
 .chatbox .outgoing {
@@ -145,9 +178,9 @@ textarea)::-webkit-scrollbar-thumb {
     padding: 12px 16px;
     border-radius: 10px 10px 0 10px;
     max-width: 75%;
-    color: #fff;
-    font-size: 0.95rem;
-    background: #121312;
+    font-size: 1.1rem;
+    background: var(--primary-bg-color);
+    color: var(--text-color);
 }
 
 .chatbox .chat li {
@@ -155,7 +188,10 @@ textarea)::-webkit-scrollbar-thumb {
 }
 
 .chatbox .incoming p {
-    border-radius: 10px 10px 10px 0;
+    background: #e8e8e8;
+    /* Lighter background for incoming messages */
+    color: var(--chat-text-color);
+    /* ... */
 }
 
 .chatbox .chat p.error {
@@ -169,16 +205,13 @@ textarea)::-webkit-scrollbar-thumb {
 }
 
 
-/* Starter Questions Styling */
-
-
-/* Initial state - hidden */
+/* Style adjustments for starter questions */
 
 #starter-questions {
+    margin-top: auto;
+    /* Pushes starter questions to the bottom */
+    transition: transform var(--transition-speed) ease-out, opacity var(--transition-speed) ease-out;
     display: none;
-    opacity: 0;
-    transform: translateY(100%);
-    transition: transform 0.5s ease-out, opacity 0.5s ease-out;
 }
 
 
@@ -192,15 +225,39 @@ textarea)::-webkit-scrollbar-thumb {
     /* Move it into view */
 }
 
+
+/* Starter question button styling */
+
 .chatbox .starter-question {
-    margin: 15px 0;
-    padding: 10px;
-    background: #e8e8e8;
-    /* Light grey background */
-    border-radius: 10px;
-    color: #333;
-    /* Dark text color for readability */
-    font-size: 0.9rem;
+    display: block;
+    /* Make it a block element */
+    margin: var(--button-margin);
+    padding: var(--button-padding);
+    background: var(--button-bg-color);
+    color: var(--button-text-color);
+    font-size: var(--button-font-size);
+    border-radius: var(--button-border-radius);
+    transition: var(--button-transition);
+    text-align: center;
+    /* Center the text inside the button */
+    border: none;
+    /* Remove border */
+    cursor: pointer;
+    /* Cursor changes to indicate it's clickable */
+    text-decoration: none;
+    /* Remove text decoration in case it's an <a> tag */
+    outline: none;
+    /* Remove outline to avoid default focus styles */
+}
+
+
+/* Starter question button hover effect */
+
+.chatbox .starter-question:hover,
+.chatbox .starter-question:focus {
+    /* Also add focus for keyboard navigation */
+    background: var(--button-bg-hover-color);
+    color: var(--button-hover-text-color);
 }
 
 .chatbox .starter-question p {
@@ -209,21 +266,26 @@ textarea)::-webkit-scrollbar-thumb {
     /* Dark color for the introductory text */
 }
 
+
+/* Adjustments for the wrapper to ensure even spacing */
+
 .starter-questions-wrapper {
     display: flex;
     justify-content: center;
-    /* Centers the flex items horizontally */
-    gap: 10px;
-    /* Adds space between the flex items */
+    gap: 20px;
+    /* Increase gap for clearer separation */
+    padding: 0px 0px 20px 0px;
+    /* Increase padding for more space */
+    /* Wrap items to next line if space is insufficient */
 }
+
+
+/* Ensures that the unordered list has no indentation or bullet points */
 
 .chatbox ul {
     list-style-type: none;
-    /* Removes bullet points */
-    padding-left: 0;
-    /* Removes indentation */
-    margin-left: 0;
-    /* Removes any default margin */
+    padding: 0;
+    margin: 0;
 }
 
 .chatbox .starter-question li {
@@ -244,20 +306,24 @@ textarea)::-webkit-scrollbar-thumb {
 .chatbox .bottom-chat {
     position: absolute;
     bottom: 50px;
-    width: 90%;
+    width: 92%;
     background: #fff;
+    height: 12%;
+    padding-bottom: 100px;
     /* Add any additional styling as needed */
 }
 
 .chatbot .chat-input {
     display: flex;
     gap: 5px;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    background: #fff;
-    padding: 3px 20px;
+    position: relative;
+    /* Changed from absolute to relative */
+    background: var(--chat-bg-color);
+    padding: 10px 20px;
     border-top: 1px solid #ddd;
+    border-bottom-left-radius: var(--border-radius);
+    border-bottom-right-radius: var(--border-radius);
+    /* ... */
 }
 
 .chat-input textarea {
@@ -268,7 +334,7 @@ textarea)::-webkit-scrollbar-thumb {
     resize: none;
     max-height: 180px;
     padding: 15px 15px 15px 0;
-    font-size: 0.95rem;
+    font-size: 1.1rem;
 }
 
 .chat-input span {
@@ -290,7 +356,249 @@ textarea)::-webkit-scrollbar-thumb {
     visibility: visible;
 }
 
-@media (max-width: 490px) {
+.rate-chatbot {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    /* Fixed pixel spacing */
+    margin-top: 10px;
+    position: absolute;
+    bottom: 35%;
+    right: 35px;
+    left: 35px;
+    /* Fixed pixel vertical spacing */
+}
+
+.hide {
+    display: none !important;
+    /* The !important ensures that this rule has priority */
+}
+
+.rate-button {
+    border: none;
+    background-color: #ffffff;
+    padding: 10px;
+    /* Fixed pixel padding */
+    border-radius: 50%;
+    /* Round shape */
+    font-size: 50px;
+    /* Fixed pixel font size */
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    outline: none;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    /* Shadow for depth */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 150px;
+    /* Fixed pixel width */
+    height: 140px;
+    /* Fixed pixel height */
+}
+
+.rate-button.like {
+    color: #bde6c7;
+}
+
+.rate-button.dislike {
+    color: #e0babd;
+}
+
+.rate-button.like:hover,
+.rate-button.like:focus {
+    background-color: #7de595;
+    /* Green background for like button on hover/focus */
+    transform: scale(1.1);
+    /* Enlarge button on hover/focus */
+}
+
+.rate-button.dislike:hover,
+.rate-button.dislike:focus {
+    background-color: #e07b83;
+    /* Red background for dislike button on hover/focus */
+    transform: scale(1.1);
+    /* Enlarge button on hover/focus */
+}
+
+#feedback {
+    display: flex;
+    flex-direction: column;
+}
+
+#feedback h1 {
+    position: absolute;
+    bottom: 60%;
+    font-size: 1.5em;
+    /* A larger font size for headers */
+    color: #333;
+    /* A dark grey that isn't as harsh as black */
+    text-align: center;
+    /* Center the header text */
+    margin-top: 20px;
+    /* Provide some space above the header */
+    margin-bottom: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+    /* Provide some space below the header */
+    font-weight: normal;
+    /* Option to not have it bold */
+    line-height: 1.4;
+    /* More readable line height */
+}
+
+.close-button {
+    font-size: 16px;
+    color: white;
+    background-color: #333;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    /* Adjust as necessary to match the provided image */
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /* Adjust as necessary to match the provided image */
+    transition: background-color 0.3s, box-shadow 0.3s;
+    /* Positioning the close button can be done with flexbox or absolute positioning, depending on your layout */
+    margin-top: 20px;
+    /* Spacing from the other elements */
+    align-self: center;
+    margin-bottom: 30%;
+    width: 180px;
+    height: 60px;
+}
+
+.close-button:hover,
+.close-button:focus {
+    background-color: #444;
+    /* Slightly lighter than the normal state */
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+    /* Larger shadow for hover/focus */
+}
+
+.dislike-feedback-chat-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 90%;
+    /* Use the full width of the parent container */
+    margin-top: 30px;
+    margin-left: 20px;
+    font-size: 20px;
+    /* Space above the input area */
+}
+
+#dislike-feedback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+}
+
+#dislike-feedback h1 {
+    position: absolute;
+    bottom: 100%;
+    font-size: 1.5em;
+    /* A larger font size for headers */
+    color: #333;
+    /* A dark grey that isn't as harsh as black */
+    text-align: center;
+    /* Center the header text */
+    margin-top: 20px;
+    /* Provide some space above the header */
+    margin-bottom: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+    /* Provide some space below the header */
+    font-weight: normal;
+    /* Option to not have it bold */
+    line-height: 1.4;
+    /* More readable line height */
+}
+
+.feedback-content {
+    width: 100%;
+    max-width: 500px;
+    position: absolute;
+    top: 39%
+    /* Adjust as needed for your design */
+}
+
+#feedback-textarea {
+    flex-grow: 1;
+    /* Let the textarea grow to fill the space */
+    padding: 10px;
+    /* Padding inside the textarea */
+    border-radius: 5px;
+    /* Rounded corners for the textarea */
+    border: 1px solid #ccc;
+    /* A light border for the textarea */
+    margin-right: 5px;
+    width: 30%;
+    height: 198px;
+    /* Space between the textarea and the send button */
+    resize: none;
+    font-size: 16px;
+    /* Allow only vertical resizing */
+}
+
+#feedback-btn {
+    padding: 10px;
+    /* Padding for clickable area */
+    background-color: #5c5c5c;
+    /* A neutral color for the send button */
+    border-radius: 50%;
+    /* Circular shape for the send button */
+    color: white;
+    /* Icon color */
+    font-size: 24px;
+    /* Icon size */
+    cursor: pointer;
+    /* Pointer cursor on hover */
+    user-select: none;
+    /* Prevent text selection on the icon */
+    display: flex;
+    /* To center the icon inside the span */
+    align-items: center;
+    justify-content: center;
+}
+
+#feedback-btn:hover {
+    background-color: #6c6c6c;
+    /* Slightly lighter on hover for feedback */
+}
+
+#thank-you-div {
+    display: flex;
+    flex-direction: column;
+}
+
+#thank-you-div h1 {
+    position: absolute;
+    top: 50%;
+    font-size: 1.5em;
+    /* A larger font size for headers */
+    color: #333;
+    /* A dark grey that isn't as harsh as black */
+    text-align: center;
+    /* Center the header text */
+    margin-top: 20px;
+    /* Provide some space above the header */
+    margin-bottom: 20px;
+    margin-right: 10px;
+    margin-left: 10px;
+    /* Provide some space below the header */
+    font-weight: normal;
+    /* Option to not have it bold */
+    line-height: 1.4;
+    /* More readable line height */
+}
+
+@media (max-width: 480px) {
     .chatbot-toggler {
         right: 20px;
         bottom: 20px;
@@ -299,12 +607,11 @@ textarea)::-webkit-scrollbar-thumb {
         right: 0;
         bottom: 0;
         height: 100%;
-        border-radius: 0;
         width: 100%;
     }
     .chatbot .chatbox {
         height: 80%;
-        padding: 25px 15px 150px;
+        padding: 100px 20px;
     }
     .chatbot .chat-input {
         padding: 5px 15px;
@@ -312,8 +619,28 @@ textarea)::-webkit-scrollbar-thumb {
     .chatbot header span {
         display: block;
     }
-    #starter-questions {
-        width: 92%;
+    .chat .bottom-chat {
+        width: 93%;
         height: 17%;
+    }
+    .rate-button {
+        font-size: 50px;
+        /* Adjusted font size in pixels */
+        padding: 16px;
+        /* Adjusted padding in pixels */
+        width: 130px;
+        /* Adjusted width in pixels for better touch targets */
+        height: 120px;
+        /* Adjusted height in pixels for better touch targets */
+    }
+    #feedback h1 {
+        font-size: 2em;
+        /* Adjust the font size for very small screens */
+        padding: 10px 10px;
+        /* Add padding to keep the text from touching the sides */
+        /* You can add additional styles here if needed */
+    }
+    #feedback .close-button {
+        bottom: 15%;
     }
 }

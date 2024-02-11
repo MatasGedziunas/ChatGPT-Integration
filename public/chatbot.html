@@ -9,6 +9,7 @@
     <!-- Google Fonts Link For Icons -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@48,400,1,0" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
     <script src="script.js" defer></script>
 </head>
 
@@ -29,21 +30,53 @@
             </li>
             <!-- Starter Questions -->
             <li class="chat bottom-chat" id="starter-questions">
-                <ul>
-                    <div class="starter-questions-wrapper">
-                        <div class="starter-question" onclick="handleStarterQuestion(this)">
-                            <li>What's the status of my order?</li>
-                        </div>
-                        <div class="starter-question" onclick="handleStarterQuestion(this)">
-                            <li>Where do you ship to?</li>
-                        </div>
-                    </div>
-                </ul>
+                <div class="starter-questions-wrapper">
+                    <button class="starter-question" onclick="handleStarterQuestion(this)">
+                        What's the status of my order?
+                    </button>
+                    <button class="starter-question" onclick="handleStarterQuestion(this)">
+                        Where do you ship to?
+                    </button>
+                </div>
             </li>
         </ul>
         <div class="chat-input">
             <textarea placeholder="Enter a message..." spellcheck="false" required></textarea>
             <span id="send-btn" class="material-symbols-rounded">send</span>
+        </div>
+        <div class="hide" id="feedback">
+            <h1>
+                Give us feedback on Simple Painting assistant
+            </h1>
+            <div class="rate-chatbot">
+                <button class="rate-button like" onclick="rateChatbot('like')">
+                    <i class="fas fa-thumbs-up"></i>
+                </button>
+                <button class="rate-button dislike" onclick="rateChatbot('dislike')">
+                    <i class="fas fa-thumbs-down"></i>
+                </button>
+            </div>
+            <button class="close-button" onclick="closeFeedback()">
+                Close
+            </button>
+        </div>
+        <div class="hide" id="dislike-feedback">
+            <div class="feedback-content">
+                <h1>Describe what went wrong in your conversation with our assistant.</h1>
+                <div class="dislike-feedback-chat-input">
+                    <textarea id="feedback-textarea" rows="4" placeholder="Type your feedback here..."></textarea>
+                    <span id="feedback-btn" class="material-symbols-rounded">send</span>
+                </div>
+                <button class="close-button" onclick="closeFeedback()">
+                Close
+            </button>
+            </div>
+        </div>
+        <div class="hide" id="thank-you-div">
+            <h1>Thank you for helping us improve :)</h1>
+            <button class="close-button" onclick="closeFeedback()">
+                Close
+            </button>
         </div>
     </div>
 

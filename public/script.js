@@ -4,8 +4,14 @@ const chatbox = document.querySelector(".chatbox");
 const conversation = document.querySelector(".conversation");
 const chatInput = document.querySelector(".chat-input textarea");
 const sendChatBtn = document.querySelector(".chat-input span");
-const starterQuestions = document.querySelector("#starter-questions");
+const chatInputDiv = document.querySelector(".chat-input");
+const starterQuestions = document.getElementById('starter-questions');
 const localStorageIdentifier = "simplePainting-chatHistory";
+const feedbackDiv = document.getElementById('feedback');
+const dislikeFeedbackDiv = document.getElementById('dislike-feedback');
+const dislikeFeedbackInput = document.getElementById('feedback-textarea');
+const dislikeFeedbackSendButton = document.getElementById('feedback-btn');
+const thankYouDiv = document.getElementById('thank-you-div');
 let userMessage = null; // Variable to store user's message
 let canSend = true;
 let chatHistory = localStorage.getItem(localStorageIdentifier);
@@ -37,10 +43,11 @@ function updateChatUI(chunk) {
     if (chunk.status == 200) {
         saveChatMessage(roles.assistant, lastMessageElement.innerHTML);
         lastMessageElement.innerHTML = linkifyApiResponse(lastMessageElement.innerHTML);
+        canSend = true;
     } else {
         lastMessageElement.innerHTML += chunk.message;
     }
-
+    chatbox.scrollTo(0, chatbox.scrollHeight);
 }
 
 const generateResponse = async (chatElement, userMessage) => {
@@ -52,7 +59,9 @@ const generateResponse = async (chatElement, userMessage) => {
     } else {
         messageElement.classList.add("error");
         messageElement.textContent = "Oops! Something went wrong on our servers. For the best support, please contact us at support@simple-painting.com. Thank you for understanding.";
+        canSend = true;
     }
+
     isFirstChunk = true;
     chatbox.scrollTo(0, chatbox.scrollHeight);
     sendChatBtn.disabled = true;
@@ -62,6 +71,7 @@ const generateResponse = async (chatElement, userMessage) => {
 }
 
 const handleChat = () => {
+    canSend = false;
     hideStarterQuestions();
     userMessage = chatInput.value.trim();
     if (!userMessage) return;
@@ -131,14 +141,16 @@ function showStarterQuestions() {
 
 function hideStarterQuestions() {
     starterQuestions.classList.remove('show');
-    chatbox.style.padding = "25px 15px 100px";
+    chatbox.style.padding = "25px 15px 40px";
 }
 
-function handleStarterQuestion(starterQuestionDiv) {
-    const question = starterQuestionDiv.querySelector("li").textContent;
+function handleStarterQuestion(button) {
+    const question = button.textContent;
     chatInput.value = question;
     hideStarterQuestions();
     handleChat();
+    chatInput.style.height = `${inputInitHeight}px`;
+    chatInput.style.height = `${chatInput.scrollHeight}px`;
 }
 
 function showChatHistory() {
@@ -174,9 +186,9 @@ chatInput.addEventListener("keydown", (e) => {
             chatInput.style.height = `${inputInitHeight}px`;
             chatInput.style.height = `${chatInput.scrollHeight}px`;
             canSend = false;
-            setTimeout(() => {
-                canSend = true;
-            }, 1000);
+            // setTimeout(() => {
+            //     canSend = true;
+            // }, 1000);
         }
     }
 });
@@ -193,22 +205,85 @@ function initiateWebSocketConnection() {
             updateChatUI(response);
         } else {
             // Handle errors or status messages
-
+            console.error("Can't connect to backend server");
         }
     };
 }
 
+function closeChatbox() {
+    chatbox.classList.add('hide');
+    chatInputDiv.classList.add('hide');
+    feedbackDiv.classList.remove('hide');
+}
+
+function openChatbox() {
+    chatbox.classList.remove('hide');
+    chatInputDiv.classList.remove('hide');
+    feedbackDiv.classList.add('hide');
+}
+
+function closeHandler() {
+    if (!document.body.classList.contains("show-chatbot")) {
+        document.body.classList.toggle("show-chatbot");
+    } else if (!chatbox.classList.contains('hide')) {
+        closeChatbox();
+    } else {
+        closeFeedback();
+    }
+}
+
 sendChatBtn.addEventListener("click", handleChat);
 closeBtn.addEventListener("click", () => {
-    document.body.classList.remove("show-chatbot")
+    closeHandler();
     ws.close();
 });
 chatbotToggler.addEventListener("click", () => {
-    document.body.classList.toggle("show-chatbot")
+    closeHandler();
     if (chatHistory) {
         showChatHistory();
     }
     initiateWebSocketConnection();
 });
+
+function closeFeedback() {
+    document.body.classList.toggle("show-chatbot");
+    dislikeFeedbackDiv.classList.add('hide');
+    thankYouDiv.classList.add('hide');
+    setTimeout(() => {
+        openChatbox();
+    }, 400);
+}
+
+
+function dislikeFeedbackHandler() {
+    console.log(dislikeFeedbackInput.value);
+    dislikeFeedbackDiv.classList.toggle('hide');
+    thankYouDiv.classList.remove('hide');
+    dislikeFeedbackInput.value = "";
+}
+
+dislikeFeedbackSendButton.addEventListener("click", () => {
+    dislikeFeedbackHandler();
+});
+
+dislikeFeedbackInput.addEventListener("keydown", (e) => {
+    // If Enter key is pressed and message sending is allowed
+    if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        dislikeFeedbackHandler();
+    }
+});
+
+function rateChatbot(rating) {
+    if (rating === 'like') {
+        setTimeout(() => {
+            closeFeedback();
+        }, 100);
+    } else {
+        feedbackDiv.classList.add('hide');
+        dislikeFeedbackDiv.classList.remove('hide');
+    }
+
+}
+
 showStarterQuestions();
-console.log("wtf");
