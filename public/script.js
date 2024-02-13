@@ -20,7 +20,7 @@ const serverUrl = "http://localhost:3000/getResponse";
 const roles = { user: "user", assistant: "assistant" };
 const createChatLi = (message, className) => {
     // Create a chat <li> element with passed message and className
-    message = linkifyApiResponse(message);
+    message = getMarkdownText(message);
     const chatLi = document.createElement("li");
     chatLi.classList.add("chat", `${className}`);
     let chatContent = className === "outgoing" ? `<p></p>` : `<span class="material-symbols-outlined">smart_toy</span><p></p>`;
@@ -42,7 +42,7 @@ function updateChatUI(chunk) {
     }
     if (chunk.status == 200) {
         saveChatMessage(roles.assistant, lastMessageElement.innerHTML);
-        lastMessageElement.innerHTML = linkifyApiResponse(lastMessageElement.innerHTML);
+        lastMessageElement.innerHTML = getMarkdownText(lastMessageElement);
         canSend = true;
     } else {
         lastMessageElement.innerHTML += chunk.message;
@@ -86,6 +86,12 @@ const handleChat = () => {
         chatbox.scrollTo(0, chatbox.scrollHeight);
         generateResponse(incomingChatLi, userMessage);
     }, 600);
+}
+
+function getMarkdownText(text) {
+    const temp = document.createElement('div');
+    temp.innerHTML = marked(text);
+    return temp.querySelector('p').textContent;
 }
 
 function linkifyApiResponse(apiResponse) {
@@ -168,6 +174,7 @@ function showChatHistory() {
 }
 
 function addMessageElementToChat(chatLi) {
+    console.log(chatLi);
     chatbox.appendChild(chatLi);
 }
 
