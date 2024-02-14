@@ -42,7 +42,7 @@ function updateChatUI(chunk) {
     }
     if (chunk.status == 200) {
         saveChatMessage(roles.assistant, lastMessageElement.innerHTML);
-        lastMessageElement.innerHTML = getMarkdownText(lastMessageElement);
+        lastMessageElement.innerHTML = getMarkdownText(lastMessageElement.innerHTML);
         canSend = true;
     } else {
         lastMessageElement.innerHTML += chunk.message;
@@ -61,7 +61,6 @@ const generateResponse = async (chatElement, userMessage) => {
         messageElement.textContent = "Oops! Something went wrong on our servers. For the best support, please contact us at support@simple-painting.com. Thank you for understanding.";
         canSend = true;
     }
-
     isFirstChunk = true;
     chatbox.scrollTo(0, chatbox.scrollHeight);
     sendChatBtn.disabled = true;
@@ -91,31 +90,12 @@ const handleChat = () => {
 function getMarkdownText(text) {
     const temp = document.createElement('div');
     temp.innerHTML = marked(text);
-    return temp.querySelector('p').textContent;
+    const linkElement = temp.querySelector('a');
+    if (linkElement) {
+        linkElement.setAttribute('target', '_blank');
+    }
+    return temp.querySelector('p').innerHTML;
 }
-
-function linkifyApiResponse(apiResponse) {
-    // Extract the message from the response
-    let message = apiResponse;
-
-    // Regular expression to match URLs
-    const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-
-    // Replace URLs with <a> tags
-    const linkedMessage = message.replace(urlRegex, function (url) {
-        // Ensure the url starts with a valid protocol or 'www.'
-        let hyperlink = url;
-        if (!hyperlink.match('^https?:\/\/')) {
-            hyperlink = 'http://' + hyperlink; // Assuming http if no protocol is specified
-        }
-        // Return the hyperlink <a> tag
-        return `<a href="${hyperlink}" target="_blank">${url}</a>`;
-    });
-
-    // Return the linked message
-    return linkedMessage;
-}
-
 
 function saveChatMessage(role, message) {
     try {
@@ -174,7 +154,6 @@ function showChatHistory() {
 }
 
 function addMessageElementToChat(chatLi) {
-    console.log(chatLi);
     chatbox.appendChild(chatLi);
 }
 
@@ -193,9 +172,6 @@ chatInput.addEventListener("keydown", (e) => {
             chatInput.style.height = `${inputInitHeight}px`;
             chatInput.style.height = `${chatInput.scrollHeight}px`;
             canSend = false;
-            // setTimeout(() => {
-            //     canSend = true;
-            // }, 1000);
         }
     }
 });
